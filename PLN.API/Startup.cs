@@ -53,7 +53,13 @@ namespace PLN.API
             });
 
             services.AddDbContext<PLNContext>(
-                options => options.UseSqlServer(Configuration["Services:ConnectionString"]));
+                options => options.UseSqlServer(Configuration["Services:ConnectionString"], sqlServerOptionsAction: sqlOptions =>
+                {
+                    sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 3,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorNumbersToAdd: null);
+                }));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
