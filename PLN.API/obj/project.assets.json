@@ -5825,23 +5825,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Rony\\.nuget\\packages\\": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\andre\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Rony\\source\\repos\\PLN.API\\PLN.API\\PLN.API.csproj",
+      "projectUniqueName": "C:\\Users\\andre\\Source\\Repos\\plnapi\\PLN.API\\PLN.API.csproj",
       "projectName": "PLN.API",
-      "projectPath": "C:\\Users\\Rony\\source\\repos\\PLN.API\\PLN.API\\PLN.API.csproj",
-      "packagesPath": "C:\\Users\\Rony\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Rony\\source\\repos\\PLN.API\\PLN.API\\obj\\",
+      "projectPath": "C:\\Users\\andre\\Source\\Repos\\plnapi\\PLN.API\\PLN.API.csproj",
+      "packagesPath": "C:\\Users\\andre\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\andre\\Source\\Repos\\plnapi\\PLN.API\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\Rony\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\andre\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -5850,8 +5846,7 @@
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {},
-        "https://grupoprides.pkgs.visualstudio.com/GPBot/_packaging/gpbot/nuget/v3/index.json": {},
-        "https://nuget.telerik.com/nuget": {}
+        "https://grupoprides.pkgs.visualstudio.com/GPBot/_packaging/gpbot/nuget/v3/index.json": {}
       },
       "frameworks": {
         "netcoreapp3.1": {
@@ -5912,7 +5907,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.303\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.102\\RuntimeIdentifierGraph.json"
       }
     }
   }

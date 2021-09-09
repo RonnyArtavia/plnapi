@@ -17,40 +17,40 @@ namespace PLN.API.Controllers
     public class PadronController : Controller
     {
         private readonly ILogger<PadronController> _logger;
+        private readonly PLNContext _context;
 
-        public PadronController(ILogger<PadronController> logger)
+        public PadronController(ILogger<PadronController> logger, PLNContext context)
         {
             _logger = logger;
+            _context = context;
         }
         [HttpGet("Ciudadano/{id}")]
         [ProducesResponseType(typeof(Padron), 200)]
-        public ActionResult Ciudadano(int id)
+        public async Task<ActionResult> CiudadanoAsync(int id)
         {
-            using (PLNContext db = new PLNContext())
+            //using PLNContext db = new PLNContext();
+            TextInfo myTI = new CultureInfo("es-CR", false).TextInfo;
+            Ciudadano ciudadano = new Ciudadano();
+            var data = await _context.Padrons.Include(c => c.CodelecNavigation).FirstOrDefaultAsync(p => p.Cedula == id);
+            if (data != null)
             {
-                TextInfo myTI = new CultureInfo("es-CR", false).TextInfo;
-                Ciudadano ciudadano = new Ciudadano();
-                var data = db.Padrons.Include(c=> c.CodelecNavigation).FirstOrDefault(p => p.Cedula == id);
-                if (data != null)
+                ciudadano = new Ciudadano()
                 {
-                    ciudadano = new Ciudadano()
-                    {
-                        Cedula = data.Cedula,
-                        Junta = data.Junta,
-                        Nombre = myTI.ToTitleCase(data.Nombre.Trim().ToLower()),
-                        Apellido1 = myTI.ToTitleCase(data.Apellido1.Trim().ToLower()),
-                        Apellido2 = myTI.ToTitleCase(data.Apellido1.Trim().ToLower()),
-                        NombreCompleto = data.NombreCompleto,
-                        Provincia = myTI.ToTitleCase(data.CodelecNavigation.Provincia.Trim().ToLower()),
-                        Canton = myTI.ToTitleCase(data.CodelecNavigation.Canton.Trim().ToLower()),
-                        Distrito = myTI.ToTitleCase(data.CodelecNavigation.Distrito.Trim().ToLower()),
-                        Fechacaduc = data.Fechacaduc,
-                        
-                    };
-                }
-                           
-                return Ok(ciudadano);
+                    Cedula = data.Cedula,
+                    Junta = data.Junta,
+                    Nombre = myTI.ToTitleCase(data.Nombre.Trim().ToLower()),
+                    Apellido1 = myTI.ToTitleCase(data.Apellido1.Trim().ToLower()),
+                    Apellido2 = myTI.ToTitleCase(data.Apellido1.Trim().ToLower()),
+                    NombreCompleto = data.NombreCompleto,
+                    Provincia = myTI.ToTitleCase(data.CodelecNavigation.Provincia.Trim().ToLower()),
+                    Canton = myTI.ToTitleCase(data.CodelecNavigation.Canton.Trim().ToLower()),
+                    Distrito = myTI.ToTitleCase(data.CodelecNavigation.Distrito.Trim().ToLower()),
+                    Fechacaduc = data.Fechacaduc,
+
+                };
             }
+
+            return Ok(ciudadano);
         }
 
     }

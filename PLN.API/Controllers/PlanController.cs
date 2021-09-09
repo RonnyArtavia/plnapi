@@ -21,11 +21,14 @@ namespace PLN.API.Controllers
     {
         private readonly ILogger<PadronController> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly PLNContext _context;
 
-        public PlanesController(ILogger<PadronController> logger, IHttpClientFactory httpClientFactory)
+
+        public PlanesController(ILogger<PadronController> logger, IHttpClientFactory httpClientFactory, PLNContext context)
         {
             _logger = logger;
             this._httpClientFactory = httpClientFactory;
+            _context = context;
         }
         [HttpGet("Plan/{token}/{id}")]
         [ProducesResponseType(typeof(Padron), 200)]
@@ -33,36 +36,32 @@ namespace PLN.API.Controllers
         {
             if (token != "actp9l2955022692304pln1")
                 return Forbid();
-            using (PLNContext db = new PLNContext())
+           // using PLNContext db = new PLNContext();
+            TextInfo myTI = new CultureInfo("es-CR", false).TextInfo;
+            var data = _context.PlanesPilotos.FirstOrDefault(p => p.Telefono == id);
+            if (data != null)
             {
-                TextInfo myTI = new CultureInfo("es-CR", false).TextInfo;
-                var data = db.PlanesPilotos.FirstOrDefault(p => p.Telefono == id);
-                if (data != null)
-                {
-                    return Ok(data);
-                }
-
-                return Ok(new PlanesPiloto());
+                return Ok(data);
             }
+
+            return Ok(new PlanesPiloto());
         }
         [HttpGet("Pruebasms/{token}/{id}")]
         [ProducesResponseType(typeof(Padron), 200)]
-        public ActionResult Pruebasms(string token, long id)
+        public async Task<ActionResult> PruebasmsAsync(string token, long id)
         {
             if (token != "actp9l2955022692304pln1")
                 return Forbid();
-            using (PLNContext db = new PLNContext())
+            //using PLNContext db = new PLNContext();
+            TextInfo myTI = new CultureInfo("es-CR", false).TextInfo;
+            var data = await _context.PlanesPilotos.FirstOrDefaultAsync(p => p.Telefono == id);
+            if (data != null)
             {
-                TextInfo myTI = new CultureInfo("es-CR", false).TextInfo;
-                var data = db.PlanesPilotos.FirstOrDefault(p => p.Telefono == id);
-                if (data != null)
-                {
-                    var mensajeEviado = EnviarInstruccionesSMS(data.Telefono, data.Telco);
-                    return Ok(data);
-                }
-
-                return Ok(new PlanesPiloto());
+                var mensajeEviado = EnviarInstruccionesSMS(data.Telefono, data.Telco);
+                return Ok(data);
             }
+
+            return Ok(new PlanesPiloto());
         }
         [HttpPost("ActivarPlan")]
         [ProducesResponseType(typeof(Padron), 200)]
@@ -72,47 +71,42 @@ namespace PLN.API.Controllers
                 return Forbid();
             try
             {
-                using (PLNContext db = new PLNContext())
+                //using PLNContext db = new PLNContext();
+                var plan = await _context.PlanesPilotos.FirstOrDefaultAsync(p => p.Telefono == data.Telefono);
+                if (data != null)
                 {
-
-                    var plan = db.PlanesPilotos.FirstOrDefault(p => p.Telefono == data.Telefono);
-                    if (data != null)
+                    if (plan.RecargaRealizada == null || plan.RecargaRealizada == false)
                     {
-                        if (plan.RecargaRealizada == null || plan.RecargaRealizada == false)
+                        bool telefonoRecargado = false;
+                        //Recargar
+                        if (plan.Ubicacion != "Pruebas" && plan.Plan == "Prepago")
                         {
-                            bool telefonoRecargado = false;
-                            //Recargar
-                            if (plan.Ubicacion != "Pruebas" && plan.Plan == "Prepago")
-                            {
-                                telefonoRecargado = await Recargar(plan.Telefono, data.Telco);
-                            }
-                            plan.RecargaRealizada = telefonoRecargado;
-                            plan.Correo = data.Correo;
-                            plan.AceptaTerminos = true;
-                            plan.FechaAceptaTerminos = DateTime.Now;
-                            plan.Cedula = data.Cedula;
-                            plan.Modificado = DateTime.Now;
-                            plan.Telco = data.Telco;
-                            plan.Plan = data.Plan;
-                            plan.NombrePadron = data.NombrePadron;
-                            db.SaveChanges();
-
-                            if(plan.Ubicacion == "Pruebas")
-                                EnviarInstruccionesSMS(plan.Telefono, data.Telco);
-                            return Ok("");
+                            telefonoRecargado = await Recargar(plan.Telefono, data.Telco);
                         }
-                        else
-                        {
-                            return NotFound("Plan ya esta activo");
-                        }
+                        plan.RecargaRealizada = telefonoRecargado;
+                        plan.Correo = data.Correo;
+                        plan.AceptaTerminos = true;
+                        plan.FechaAceptaTerminos = DateTime.Now;
+                        plan.Cedula = data.Cedula;
+                        plan.Modificado = DateTime.Now;
+                        plan.Telco = data.Telco;
+                        plan.Plan = data.Plan;
+                        plan.NombrePadron = data.NombrePadron;
+                        await _context.SaveChangesAsync();
 
+                        if (plan.Ubicacion == "Pruebas")
+                            EnviarInstruccionesSMS(plan.Telefono, data.Telco);
+                        return Ok("");
                     }
                     else
                     {
-                        return NotFound("Teléfono no encotado");
+                        return NotFound("Plan ya esta activo");
                     }
 
-
+                }
+                else
+                {
+                    return NotFound("Teléfono no encontrado");
                 }
             }
             catch (Exception ex)
